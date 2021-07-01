@@ -17,72 +17,78 @@ let data=[];
 /*新增邏輯*/
 
 save.addEventListener("click",function(e){
-    if(txt.value==""){
+    if(txt.value.trim()===""){
         alert("尚未輸入待辦事項");
         return;
     }
     addNew();
 });
 function addNew(){
-    let obj={};
-    obj.content=txt.value;
-    obj.status="undo";
+    const obj = {}
+    obj.content=txt.value,
+    obj.status="undo"
     data.push(obj);
     renderData();
     txt.value="";
 };
 
+/*篩選器點擊更改樣式與確認按鈕執行函數*/
+let filterCheck="完成";
+filter.addEventListener("click",function(e){
+    if(e.target.value =="全部"){
+        btnAll.classList.add("selected");
+        btnUndo.classList.remove("selected");
+        btnDone.classList.remove("selected");
+        filterCheck="完成";
+        renderData();
+    }else if(e.target.value =="待完成"){
+        btnUndo.classList.add("selected");
+        btnAll.classList.remove("selected");
+        btnDone.classList.remove("selected");
+        filterCheck="待完成";
+        renderData();
+    }else{
+        btnDone.classList.add("selected");
+        btnAll.classList.remove("selected");
+        btnUndo.classList.remove("selected");
+        filterCheck="已完成";
+        renderData();
+    };
+});
+
 /*資料預設載入*/
 function renderData(){
-    if(btnAll.classList.length==3){
-        renderAll();
-    }else if(btnUndo.classList==3){
-        renderUndo();
-    }else if(btnDone.classList.length==3){
-        renderDone();
-    };
+    let str="";
+    data.forEach(function(item,index){
+        if(filterCheck=="完成"){
+            str+=
+            `<li class=${item.status} data-item=${index}>
+            <input type="checkbox" class="box">
+            <span>✔</span>
+            <p class=toDo>${item.content}</p><input type="image" class="del" src="https://hexschool.github.io/js-todo/assets/cancel.jpg"></li>`
+        }else if(filterCheck=="待完成"){
+            if(item.status=="undo"){
+                str+=
+                `<li class=${item.status} data-item=${index}>
+                <input type="checkbox" class="box">
+                <span>✔</span>
+                <p class=toDo>${item.content}</p><input type="image" class="del" src="https://hexschool.github.io/js-todo/assets/cancel.jpg"></li>`
+            }
+        }else if(filterCheck=="已完成"){
+            if(item.status=="check"){
+                str+=
+                `<li class=${item.status} data-item=${index}>
+                <input type="checkbox" class="box">
+                <span>✔</span>
+                <p class=toDo>${item.content}</p><input type="image" class="del" src="https://hexschool.github.io/js-todo/assets/cancel.jpg"></li>`
+            }
+        }
+        
+    })
+    item.innerHTML=str;
     undocheck();
-};
-renderData();
-
-function renderAll(){
-    let str="";
-    data.forEach(function(item,index){
-        str+=
-        `<li class=${item.status} data-item=${index}>
-        <input type="checkbox" class="box">
-        <span>✔</span>
-        <p class=toDo>${item.content}</p><input type="image" class="del" src="https://hexschool.github.io/js-todo/assets/cancel.jpg"></li>`
-    });
-    item.innerHTML=str;
-};
-function renderUndo(){
-    let str="";
-    data.forEach(function(item,index){
-        if(item.status=="undo"){
-        str+=
-        `<li class=${item.status} data-item=${index}>
-        <input type="checkbox" class="box">
-        <span>✔</span>
-        </div>
-        <p class=toDo>${item.content}</p><input type="image" class="del" src="https://hexschool.github.io/js-todo/assets/cancel.jpg"></li>`
-        };
-    });
-    item.innerHTML=str;
-};
-function renderDone(){
-    let str="";
-    data.forEach(function(item,index){
-        if(item.status!=="undo"){
-        str+=
-        `<li class=${item.status} data-item=${index}>
-        <input type="checkbox" class="box">
-        <span>✔</span>
-        <p class=toDo>${item.content}</p><input type="image" class="del" src="https://hexschool.github.io/js-todo/assets/cancel.jpg"></li>`
-        };
-    });
-    item.innerHTML=str;
 }
+
 
 /*完成與刪除邏輯*/
 item.addEventListener("click",function(e){
@@ -98,25 +104,7 @@ item.addEventListener("click",function(e){
     renderData();  
 });
 
-/*篩選器點擊更改樣式與確認按鈕執行函數*/
-filter.addEventListener("click",function(e){
-    if(e.target.value =="全部"){
-        btnAll.classList.add("selected");
-        btnUndo.classList.remove("selected");
-        btnDone.classList.remove("selected");
-        renderAll();
-    }else if(e.target.value =="待完成"){
-        btnUndo.classList.add("selected");
-        btnAll.classList.remove("selected");
-        btnDone.classList.remove("selected");
-        renderUndo();
-    }else{
-        btnDone.classList.add("selected");
-        btnAll.classList.remove("selected");
-        btnUndo.classList.remove("selected");
-        renderDone();
-    };
-});
+
 
 /*待完成項目數量*/
 function undocheck(){
@@ -141,7 +129,7 @@ list.addEventListener("click",function(e){
     }else if(e.target.value=="清除已完成項目"){
         data.forEach(function(item,index){
             if(item.status=="check"){
-                data.splice(index,1);
+                data.splice(index,data.length);
             };
         });
     }
